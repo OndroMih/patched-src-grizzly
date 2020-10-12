@@ -16,6 +16,7 @@
 
 package org.glassfish.grizzly.ssl;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -301,6 +302,10 @@ public final class SSLUtils {
         
         final SslResult result =
                 sslCtx.wrap(Buffers.EMPTY_BUFFER, buffer, HS_WRAP_ALLOCATOR);
+        
+        if (result.getSslEngineResult() != null && result.getSslEngineResult().getStatus() == SSLEngineResult.Status.CLOSED) {
+            throw new SSLException("Connection closed unexpectedly");
+        }
         
         Buffer output = result.getOutput();
         
